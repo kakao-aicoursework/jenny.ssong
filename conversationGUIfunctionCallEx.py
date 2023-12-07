@@ -4,8 +4,9 @@ import tkinter as tk
 import pandas as pd
 from tkinter import scrolledtext
 import tkinter.filedialog as filedialog
+import os
 
-openai.api_key = ''
+openai.api_key = os.getenv('GPT_KEY', '')
 
 # response에 CSV 형식이 있는지 확인하고 있으면 저장하기
 def save_to_csv(df):
