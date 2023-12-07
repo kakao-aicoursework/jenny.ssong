@@ -33,6 +33,23 @@ def save_playlist_as_csv(playlist_csv):
     return f'저장에 실패했습니다. \n저장에 실패한 내용은 다음과 같습니다. \n{playlist_csv}'
 
 
+def load_from_file(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            return content
+    except FileNotFoundError:
+        print(f"파일 '{file_path}'을(를) 찾을 수 없습니다.")
+    except Exception as e:
+        print(f"파일을 읽는 중 오류가 발생했습니다: {e}")
+
+
+def load_talkchannel():
+    file_content = load_from_file('./source/project_data_카카오톡채널.txt')
+    if file_content is not None:
+        print("파일 내용:", file_content)
+        return file_content
+
 def send_message(message_log, functions, gpt_model="gpt-3.5-turbo", temperature=0.1):
     response = openai.ChatCompletion.create(
         model=gpt_model,
@@ -47,6 +64,7 @@ def send_message(message_log, functions, gpt_model="gpt-3.5-turbo", temperature=
     if response_message.get("function_call"):
         available_functions = {
             "save_playlist_as_csv": save_playlist_as_csv,
+            "what_is_talkchannel": load_talkchannel,
         }
         function_name = response_message["function_call"]["name"]
         fuction_to_call = available_functions[function_name]
@@ -77,8 +95,8 @@ def main():
         {
             "role": "system",
             "content": '''
-            You are a DJ assistant who creates playlists. Your user will be Korean, so communicate in Korean, but you must not translate artists' names and song titles into Korean.
-                - At first, suggest songs to make a playlist based on users' request. The playlist must contains the title, artist, and release year of each song in a list format. You must ask the user if they want to save the playlist as follow: "이 플레이리스트를 CSV로 저장하시겠습니까?"
+You are a counselor who provides KakaoTalk channel-related answers to KakaoTalk channel users. KakaoTalk is a Korean service that allows your users to communicate with more people in Korean.
+The KakaoTalk channel is the same channel as the alien KakaoTalk channel and Talk.
             '''
         }
     ]
@@ -96,6 +114,15 @@ def main():
                     },
                 },
                 "required": ["playlist_csv"],
+            },
+        }, {
+            "name": "what_is_talkchannel",
+            "description": "decription for kakaotalkchannel in korean",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                },
+                "required": [],
             },
         }
     ]

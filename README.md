@@ -21,3 +21,8 @@ $ env \
 # ref : https://stackoverflow.com/questions/60469202/unable-to-install-tkinter-with-pyenv-pythons-on-macos
 ```
 
+## 1번 과제
+
+로컬의 source 파일을 기반으로 해서 function call을 할 수 있는 기반을 만들고,
+적용되어있는 톡채널 정보를 응답하는 봇을 만든다.
+<img src="./docs/mission1_result.png" title="mission1_result"></img>
