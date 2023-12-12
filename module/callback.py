@@ -1,3 +1,4 @@
+from module.aibot import AIBot
 from module.dto import ChatbotRequest
 import aiohttp
 import time
@@ -13,16 +14,22 @@ logger = logging.getLogger("Callback")
 async def callback_handler(request: ChatbotRequest) -> dict:
 
     # ===================== start =================================
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": SYSTEM_MSG},
-            {"role": "user", "content": request.userRequest.utterance},
-        ],
-        temperature=0,
-    )
-    # focus
-    output_text = response.choices[0].message.content
+    # response = openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=[
+    #         {"role": "system", "content": SYSTEM_MSG},
+    #         {"role": "user", "content": request.userRequest.utterance},
+    #     ],
+    #     temperature=0,
+    # )
+    # # focus
+    # output_text = response.choices[0].message.content
+    ai = AIBot()
+    req = request.userRequest.utterance
+    resp = ai.req_to_openai_with_func(req)
+    logging.debug('request query: %s', req)
+    logging.debug('request response: %s', resp)
+
 
    # 참고링크 통해 payload 구조 확인 가능
     payload = {
@@ -31,7 +38,7 @@ async def callback_handler(request: ChatbotRequest) -> dict:
             "outputs": [
                 {
                     "simpleText": {
-                        "text": output_text
+                        "text": resp
                     }
                 }
             ]

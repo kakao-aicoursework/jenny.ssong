@@ -3,7 +3,7 @@ import openai
 import os
 import json
 
-from module.get_source import load_talkchannel, load_from_file
+from module.get_source import load_talkchannel, load_sink, load_social, load_from_file
 
 # 환경 변수 처리 필요!
 
@@ -12,8 +12,8 @@ logger = logging.getLogger("aibot")
 
 
 class AIBot(object):
-    def __init__(self, system_msg=''):
-        openai.api_key = load_from_file('../KEY')
+    def __init__(self, key_path='KEY', system_msg=''):
+        openai.api_key = load_from_file(key_path)
         self.aibot = openai
         self.system_msg = system_msg
         self.temperature = 0.1
@@ -28,9 +28,30 @@ class AIBot(object):
                 },
                 "required": [],
             },
-        }]
+        },{
+            "name": "what_is_kakaosink",
+            "description": "decription for kakaosink in korean",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                },
+                "required": [],
+            },
+        },{
+            "name": "what_is_kakaosocial",
+            "description": "decription for kakaosocial in korean",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                },
+                "required": [],
+            },
+        },
+        ]
         self.available_functions = {
             "what_is_talkchannel": load_talkchannel,
+            "what_is_kakaosink": load_sink,
+            "what_is_kakaosocial": load_social,
         }
 
     def _call_function(self, function_name, **args):
@@ -74,6 +95,6 @@ class AIBot(object):
 
 
 if __name__ == "__main__":
-    ai = AIBot()
+    ai = AIBot(key_path='../KEY')
     logger.setLevel(logging.DEBUG)
     print(ai.req_to_openai_with_func(query="채팅 API는 어떤게 있어?"))

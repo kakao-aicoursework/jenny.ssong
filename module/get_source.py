@@ -15,12 +15,20 @@ def load_from_file(file_path):
 
 
 def load_talkchannel(**args):
-    file_content = load_from_file('../source/project_data_카카오톡채널.txt')
+    file_content = load_from_file('./source/project_data_카카오톡채널.txt')
     if file_content is not None:
-        logging.debug("파일 내용:", file_content)
+        # logging.debug("파일 내용:", file_content)
         return file_content
 
 
-if __name__ == '__main__':
-    print(load_talkchannel())
-    print()
+def load_sink(**args):
+    file_content = load_from_file('./source/project_data_카카오싱크.txt')
+    if file_content is not None:
+        # logging.debug("파일 내용:", file_content)
+        return file_content
+
+def load_social(**args):
+    file_content = load_from_file('./source/project_data_카카오소셜.txt')
+    if file_content is not None:
+        # logging.debug("파일 내용:", file_content)
+        return file_content
