@@ -57,3 +57,5 @@ target/
 .idea/
 .venv/
 source
+KEY
+.DS_Store
