@@ -56,6 +56,6 @@ target/
 .DSStore
 .idea/
 .venv/
-source
+*.txt
 KEY
 .DS_Store
