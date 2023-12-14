@@ -59,3 +59,4 @@ target/
 *.txt
 KEY
 .DS_Store
+source/chroma-persist/
