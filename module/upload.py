@@ -20,6 +20,25 @@ LOADER_DICT = {
     'txt': TextLoader
 }
 
+SINK="sink"
+TALKCHANNLE="talkchannel"
+SOCIAL="social"
+COLLECTION_LIST=[SINK, TALKCHANNLE, SOCIAL]
+
+UPLOADER_LIST = [
+    {
+        "keyword": "sink",
+        "source_dir": os.path.join(SOURCE_DIR, "project_data_카카오싱크.txt")
+    },
+    {
+        "keyword": "talkchannel",
+        "source_dir": os.path.join(SOURCE_DIR, "project_data_카카오톡채널.txt")
+    },
+    {
+        "keyword": "social",
+        "source_dir": os.path.join(SOURCE_DIR, "project_data_카카오소셜.txt")
+    },
+]
 
 def upload_embedding_from_file(file_path):
     loader = LOADER_DICT.get(file_path.split(".")[-1])
@@ -58,28 +77,67 @@ def upload_embeddings_from_dir(dir_path):
                     print("FAILED: ", file_path + f" by({e})")
                     failed_upload_files.append(file_path)
 
+def upload_talks(loaders:list):
+
+    for load in loaders:
+        loader = LOADER_DICT.get('txt')
+        if loader is None:
+            raise ValueError("Not supported file type")
+        documents = loader(load.get('source_dir')).load()
+
+        text_splitter = CharacterTextSplitter(chunk_size=512, chunk_overlap=100)
+        docs = text_splitter.split_documents(documents)
+        print(f"{load.get('keyword')} to ", docs, end='\n\n\n')
+
+        Chroma.from_documents(
+            docs,
+            OpenAIEmbeddings(),
+            collection_name=CHROMA_COLLECTION_NAME,
+            persist_directory=load.get('keyword'),
+        )
+
+    pass
 
 def upload_katalk_files(dir):
     # 실행시 OPENAI_API_KEY 환경변수에 키를 추가해 둘 것
     upload_embeddings_from_dir(dir)
 
-def check_chroma():
+def check_chroma(collection_name=CHROMA_COLLECTION_NAME):
     from pprint import pprint
 
     db = Chroma(
         persist_directory=CHROMA_PERSIST_DIR,
         embedding_function=OpenAIEmbeddings(),
-        collection_name=CHROMA_COLLECTION_NAME,
+        collection_name=collection_name,
     )
 
     docs = db.similarity_search("소셜 API 기능소개")  # get_relevant_documents 와는 넘겨주는 형식만 좀 다름. ... 뭐가 다른진 잘 모르겠다??
 
     pprint(docs)
 
+def query_db(collection_name:str, query: str, use_retriever: bool = False) -> list[str]:
+    _db = Chroma(
+        persist_directory=CHROMA_PERSIST_DIR,
+        embedding_function=OpenAIEmbeddings(),
+        collection_name=collection_name,
+    )
+    _retriever = _db.as_retriever()
+
+    if use_retriever:
+        docs = _retriever.get_relevant_documents(query)
+    else:
+        docs = _db.similarity_search(query)
+
+    str_docs = [doc.page_content for doc in docs]
+    return str_docs
+
+
 def main():
     # 한번만 돌리기
     #    upload_katalk_files(SOURCE_DIR)
-    check_chroma()
+    #check_chroma(SINK)
+    #upload_talks(UPLOADER_LIST)
+    query_db(SINK, '시작하기')
     pass
 
 
